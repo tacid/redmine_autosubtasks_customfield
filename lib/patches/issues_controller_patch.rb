@@ -29,7 +29,8 @@ module RedmineAutosubtasksCustomfield
                     author: User.current,
                     parent: parent_issue,
                     tracker: tracker,
-                    assigned_to: user
+                    assigned_to: user,
+                    description: "#{parent_issue.tracker.name} ##{parent_issue.id.to_s}",
                   )
                 end
               end
