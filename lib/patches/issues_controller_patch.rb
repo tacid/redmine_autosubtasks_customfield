@@ -12,7 +12,7 @@ module RedmineAutosubtasksCustomfield
 
       module InstanceMethods
         def new_with_autotasks
-          if (user_ids = params[:issue][:autosubtasks_for]).nil?
+          if params[:issue].nil? or (user_ids = params[:issue][:autosubtasks_for]).nil?
             new_without_autotasks
           else
             begin
