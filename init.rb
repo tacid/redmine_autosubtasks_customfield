@@ -1,9 +1,9 @@
-Redmine::Plugin.register :redmine_autosubtasks do
+Redmine::Plugin.register :redmine_autosubtasks_customfield do
   name 'Autosubtasks custom field'
   author 'Tacid'
-  description 'This plugin adds the customfield that enables to create subtasks in one click'
-  version '0.9.1'
-  url 'https://github.com/tacid/redmine_autosubtasks'
+  description 'This plugin adds the user customfield that allow to create subtasks in one click'
+  version '0.9.2'
+  url 'https://github.com/tacid/redmine_autosubtasks_customfield'
   author_url 'https://github.com/tacid'
 
   requires_redmine version_or_higher: '3.0.0'

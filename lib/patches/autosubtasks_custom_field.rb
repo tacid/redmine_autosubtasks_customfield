@@ -1,4 +1,4 @@
-module RedmineAutosubtasks
+module RedmineAutosubtasksCustomfield
   module FieldFormatPatch
     extend ActiveSupport::Concern
 
@@ -48,6 +48,6 @@ module RedmineAutosubtasks
   end
 end
 
-unless Redmine::FieldFormat.included_modules.include?(RedmineAutosubtasks::FieldFormatPatch)
-    Redmine::FieldFormat.send(:include, RedmineAutosubtasks::FieldFormatPatch)
+unless Redmine::FieldFormat.included_modules.include?(RedmineAutosubtasksCustomfield::FieldFormatPatch)
+    Redmine::FieldFormat.send(:include, RedmineAutosubtasksCustomfield::FieldFormatPatch)
 end

@@ -1,4 +1,4 @@
-module RedmineAutosubtasks
+module RedmineAutosubtasksCustomfield
   module Patches
 
     module IssuesControllerPatch
@@ -44,7 +44,7 @@ module RedmineAutosubtasks
   end
 end
 
-unless IssuesController.included_modules.include?(RedmineAutosubtasks::Patches::IssuesControllerPatch)
-  IssuesController.send(:include, RedmineAutosubtasks::Patches::IssuesControllerPatch)
+unless IssuesController.included_modules.include?(RedmineAutosubtasksCustomfield::Patches::IssuesControllerPatch)
+  IssuesController.send(:include, RedmineAutosubtasksCustomfield::Patches::IssuesControllerPatch)
 end
 
