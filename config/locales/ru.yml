@@ -2,3 +2,4 @@ ru:
   setting_plugin_autosubtasks: Настройки плагина создания подзадач
   settings_autosubtasks_select_tracker: Выберите трекер на котором создавать задачи
   label_field_for_autosubtasks: Подзадачи на пользователя
+  label_tracker_for_autosubtasks: Трекер для подзадач

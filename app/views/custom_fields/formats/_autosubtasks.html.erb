@@ -1,5 +1,5 @@
 <p>
-  <label><%= l(:label_tracker) %></label>
+  <label><%= l(:label_tracker_for_autosubtasks) %></label>
   <label class="block">
       <%= select_tag "custom_field[autosubtasks_tracker_id]",
           options_for_select( Tracker.all.map { |t| [t.name.to_s, t.id] }, custom_field.autosubtasks_tracker_id ),
