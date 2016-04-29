@@ -1,0 +1,4 @@
+en:
+  setting_plugin_autosubtasks: Settings for creating subtasks
+  settings_autosubtasks_select_tracker: Select tracker to create subtasks on
+  label_field_for_autosubtasks: Subtasks on user
