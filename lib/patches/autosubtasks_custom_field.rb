@@ -13,28 +13,58 @@ module RedmineAutosubtasksCustomfield
       end
 
       def target_class
-        @target_class ||= User
+        @target_class ||= Principal
       end
 
       def formatted_custom_value(view, custom_value, html=false)
         formatted = super(view, custom_value, html)
         if html
-          unless (html_text = view.format_object( formatted )).blank?
+          unless (html_text = format_obj(formatted, view)).blank?
             attrs = {
               tracker_id: custom_value.custom_field.autosubtasks_tracker_id,
               parent_issue_id: custom_value.customized,
               autosubtasks_for: Array(custom_value).map(&:value).to_json
             }
             html_text + " &nbsp; ".html_safe +
-            view.link_to( l(:button_create),
-               view.new_project_issue_path( custom_value.customized.project, issue: attrs ),
-               class: 'icon icon-multiple'
-            )
+              view.link_to( l(:button_create),
+                 view.new_project_issue_path( custom_value.customized.project, issue: attrs ),
+                 class: 'icon icon-multiple')
           else
             "-"
           end
         else
           formatted
+        end
+      end
+
+      def format_obj(object, view)
+        case object.class.name
+        when 'Array'
+          object.map {|o| format_obj(o, view)}.join(', ').html_safe
+        when 'User'
+          view.link_to_user(object)
+        when 'Group'
+          view.link_to(object.to_s, view.group_path(object), class: "group" )
+        else
+          view.h(object)
+        end
+      end
+
+      def possible_values_records(custom_field, object=nil)
+        if object.is_a?(Array)
+          projects = object.map {|o| o.respond_to?(:project) ? o.project : nil}.compact.uniq
+          projects.map {|project| possible_values_records(custom_field, project)}.reduce(:&) || []
+        elsif object.respond_to?(:project) && object.project
+          scope = object.project.principals
+          if custom_field.user_role.is_a?(Array)
+            role_ids = custom_field.user_role.map(&:to_s).reject(&:blank?).map(&:to_i)
+            if role_ids.any?
+              scope = scope.where("#{Member.table_name}.id IN (SELECT DISTINCT member_id FROM #{MemberRole.table_name} WHERE role_id IN (?))", role_ids)
+            end
+          end
+          scope.sorted
+        else
+          []
         end
       end
 

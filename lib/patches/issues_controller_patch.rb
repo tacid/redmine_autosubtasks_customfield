@@ -16,7 +16,7 @@ module RedmineAutosubtasksCustomfield
             new_without_autotasks
           else
             begin
-              users = User.where(id: JSON.parse(user_ids))
+              users = Principal.where(id: JSON.parse(user_ids))
               parent_issue = Issue.find(params[:issue][:parent_issue_id])
               tracker = Tracker.find(params[:issue][:tracker_id])
             rescue
