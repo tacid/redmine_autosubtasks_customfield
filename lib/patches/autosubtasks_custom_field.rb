@@ -50,6 +50,10 @@ module RedmineAutosubtasksCustomfield
         end
       end
 
+      def possible_values_options(custom_field, object=nil)
+        possible_values_records(custom_field, object).map {|u| [u.name, u.id.to_s]}
+      end
+
       def possible_values_records(custom_field, object=nil)
         if object.is_a?(Array)
           projects = object.map {|o| o.respond_to?(:project) ? o.project : nil}.compact.uniq
