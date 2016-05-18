@@ -48,7 +48,7 @@ module RedmineAutosubtasksCustomfield
         when 'Array'
           object.map {|o| format_obj(o, view)}.join('<br />').html_safe
         when 'User'
-          view.link_to_user(object, class: "icon icon-user")
+          view.link_to_user(object)
         when 'Group'
           view.link_to(object.to_s, (User.current.admin? ? view.group_path(object) : "#" ), class: "group icon icon-group" )
         else
