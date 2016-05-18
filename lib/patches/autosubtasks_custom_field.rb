@@ -25,10 +25,16 @@ module RedmineAutosubtasksCustomfield
               parent_issue_id: custom_value.customized,
               autosubtasks_for: Array(custom_value).map(&:value).to_json
             }
-            html_text + " &nbsp; ".html_safe +
+            # Show create subtasks button only for issues/show action
+            if view.request.path_parameters[:action] == 'show'
+            html_text +
+              ( Array(formatted).size > 1 ? "<br />" : " &nbsp; " ).html_safe +
               view.link_to( l(:button_create),
-                 view.new_project_issue_path( custom_value.customized.project, issue: attrs ),
-                 class: 'icon icon-multiple')
+                view.new_project_issue_path(custom_value.customized.project, issue: attrs),
+                class: 'icon icon-multiple')
+            else
+              html_text
+            end
           else
             "-"
           end
@@ -40,13 +46,13 @@ module RedmineAutosubtasksCustomfield
       def format_obj(object, view)
         case object.class.name
         when 'Array'
-          object.map {|o| format_obj(o, view)}.join(', ').html_safe
+          object.map {|o| format_obj(o, view)}.join('<br />').html_safe
         when 'User'
-          view.link_to_user(object)
+          view.link_to_user(object, class: "icon icon-user")
         when 'Group'
-          view.link_to(object.to_s, view.group_path(object), class: "group" )
+          view.link_to(object.to_s, (User.current.admin? ? view.group_path(object) : "#" ), class: "group icon icon-group" )
         else
-          view.h(object)
+          ""
         end
       end
 
@@ -70,12 +76,6 @@ module RedmineAutosubtasksCustomfield
         else
           []
         end
-      end
-
-      private
-
-      def create_subtasks_button
-        "<button>Create it!</button>".html_safe
       end
 
     end
