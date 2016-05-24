@@ -3,3 +3,6 @@ ru:
   settings_autosubtasks_select_tracker: Выберите трекер на котором создавать задачи
   label_field_for_autosubtasks: Подзадачи на пользователя
   label_tracker_for_autosubtasks: Трекер для подзадач
+  label_autosubtasks_do_create_subtasks: Создание подзадач
+  label_autosubtasks_do_send_notifications: Отправлять уведомления
+  label_autosubtasks_is_issue_viewable: Задача видима

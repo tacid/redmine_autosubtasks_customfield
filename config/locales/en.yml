@@ -3,3 +3,6 @@ en:
   settings_autosubtasks_select_tracker: Select tracker to create subtasks on
   label_field_for_autosubtasks: Subtasks on user
   label_tracker_for_autosubtasks: Tracker to create subtasks on
+  label_autosubtasks_do_create_subtasks: Add create subtasks button
+  label_autosubtasks_do_send_notifications: Send notifications for listed users
+  label_autosubtasks_is_issue_viewable: Is issue viewable for listed users

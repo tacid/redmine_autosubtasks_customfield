@@ -33,6 +33,7 @@ module RedmineAutosubtasksCustomfield
                                  cf.project(:id).where(
                                    cf[:type].eq('IssueCustomField')
                                    .and( cf[:field_format].eq('autosubtasks') )
+                                   .and( cf[:format_store].matches("%atf_is_issue_viewable: '1'%") )
                                  )
                          ) )
                   )
@@ -43,24 +44,30 @@ module RedmineAutosubtasksCustomfield
       end
 
       module InstanceMethods
-        def autotasks_custom_value_ids
-          autotask_custom_fields = CustomField.where(type: 'IssueCustomField', field_format: :autosubtasks)
-          self.custom_values.where(custom_field_id: autotask_custom_fields).pluck(:value).uniq.sort
+        def autotasks_permitted_to_view_principal_ids
+          autotask_custom_fields = (cf=CustomField.arel_table).project(:id).where(
+                                     cf[:type].eq('IssueCustomField')
+                                     .and( cf[:field_format].eq('autosubtasks') )
+                                     .and( cf[:format_store].matches("%atf_is_issue_viewable: '1'%") )
+                                   )
+          self.custom_values
+              .where(CustomValue.arel_table[:custom_field_id].in(autotask_custom_fields))
+              .pluck(:value).uniq.sort
         end
 
-        def autotasks_custom_values
-          Principal.where(id: autotasks_custom_value_ids).order(:id)
+        def autotasks_permitted_to_view_principals
+          Principal.where(id: autotasks_permitted_to_view_principal_ids).order(:id)
         end
 
         def visible_with_autotasks_field?(usr=nil)
-          self.autotasks_custom_values.include?(usr || User.current) or
-            (usr || User.current).groups(id: self.autotasks_custom_value_ids).count > 0 or
+          self.autotasks_permitted_to_view_principals.include?(usr || User.current) or
+            (usr || User.current).groups(id: self.autotasks_permitted_to_view_principal_ids).count > 0 or
             visible_without_autotasks_field?(usr)
         end
 
         def attachments_visible_with_autotasks_field?(usr=nil)
-          self.autotasks_custom_values.include?(usr || User.current) or
-            (usr || User.current).groups(id: self.autotasks_custom_value_ids).count > 0 or
+          self.autotasks_permitted_to_view_principals.include?(usr || User.current) or
+            (usr || User.current).groups(id: self.autotasks_permitted_to_view_principal_ids).count > 0 or
             attachments_visible_without_autotasks_field?(usr)
         end
       end

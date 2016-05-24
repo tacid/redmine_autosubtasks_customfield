@@ -1,4 +1,14 @@
 <p>
+  <label><%= l(:label_autosubtasks_do_create_subtasks) %></label>
+  <label class="block">
+      <%= hidden_field_tag 'custom_field[atf_do_create_subtasks]', '0' %>
+      <%= check_box_tag "custom_field[atf_do_create_subtasks]",
+          1,
+          custom_field.atf_do_create_subtasks?(true),
+          id: nil %>
+  </label>
+</p>
+<p>
   <label><%= l(:label_tracker_for_autosubtasks) %></label>
   <label class="block">
       <%= select_tag "custom_field[autosubtasks_tracker_id]",
@@ -31,3 +41,24 @@
   <%= hidden_field_tag 'custom_field[user_role][]', '' %>
 </p>
 <p><%= edit_tag_style_tag f %></p>
+
+<p>
+  <label><%= l(:label_autosubtasks_is_issue_viewable) %></label>
+  <label class="block">
+      <%= hidden_field_tag 'custom_field[atf_is_issue_viewable]', '0' %>
+      <%= check_box_tag "custom_field[atf_is_issue_viewable]",
+          1,
+          custom_field.atf_is_issue_viewable?(true),
+          id: nil %>
+  </label>
+</p>
+<p>
+  <label><%= l(:label_autosubtasks_do_send_notifications) %></label>
+  <label class="block">
+      <%= hidden_field_tag 'custom_field[atf_do_send_notifications]', '0' %>
+      <%= check_box_tag "custom_field[atf_do_send_notifications]",
+          1,
+          custom_field.atf_do_send_notifications?,
+          id: nil %>
+  </label>
+</p>

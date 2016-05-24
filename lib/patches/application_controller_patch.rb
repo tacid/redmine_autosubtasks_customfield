@@ -14,8 +14,8 @@ module RedmineAutosubtasksCustomfield
         def authorize_with_autotasks_field(ctrl = params[:controller], action = params[:action], global = false)
           ( "#{ctrl}/#{action}" == 'issues/show' and
            (
-            @issue.autotasks_custom_values.include?(User.current) or
-            User.current.groups(id: @issue.autotasks_custom_value_ids).count > 0
+            @issue.autotasks_permitted_to_view_principals.include?(User.current) or
+            User.current.groups(id: @issue.autotasks_permitted_to_view_principal_ids).count > 0
            )
           ) or authorize_without_autotasks_field(ctrl, action, global)
         end

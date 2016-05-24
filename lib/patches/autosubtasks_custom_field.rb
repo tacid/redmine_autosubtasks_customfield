@@ -6,7 +6,8 @@ module RedmineAutosubtasksCustomfield
       add 'autosubtasks'
       self.customized_class_names = %w(Issue)
       self.form_partial = 'custom_fields/formats/autosubtasks'
-      field_attributes :autosubtasks_tracker_id
+      field_attributes :atf_is_issue_viewable, :atf_do_send_notifications,
+        :atf_do_create_subtasks, :autosubtasks_tracker_id
 
       def label
         "label_field_for_autosubtasks"
@@ -18,15 +19,16 @@ module RedmineAutosubtasksCustomfield
 
       def formatted_custom_value(view, custom_value, html=false)
         formatted = super(view, custom_value, html)
+        cf=custom_value.custom_field
         if html
           unless (html_text = format_obj(formatted, view)).blank?
             attrs = {
-              tracker_id: custom_value.custom_field.autosubtasks_tracker_id,
+              tracker_id: cf.autosubtasks_tracker_id,
               parent_issue_id: custom_value.customized,
               autosubtasks_for: Array(custom_value).map(&:value).to_json
             }
             # Show create subtasks button only for issues/show action
-            if view.request.path_parameters[:action] == 'show'
+            if view.request.path_parameters[:action] == 'show' and cf.atf_do_create_subtasks?
             html_text +
               ( Array(formatted).size > 1 ? "<br />" : " &nbsp; " ).html_safe +
               view.link_to( l(:button_create),
