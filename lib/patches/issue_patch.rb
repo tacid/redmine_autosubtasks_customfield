@@ -15,6 +15,7 @@ module RedmineAutosubtasksCustomfield
           end
           alias_method_chain :visible?, :autotasks_field
           alias_method_chain :attachments_visible?, :autotasks_field
+          alias_method_chain :notified_users, :autotasks_field
         end
       end
 
@@ -44,31 +45,59 @@ module RedmineAutosubtasksCustomfield
       end
 
       module InstanceMethods
-        def autotasks_permitted_to_view_principal_ids
+        def autotasks_permitted_to_view_users
+          autotasks_custom_value_users("%atf_is_issue_viewable: '1'%")
+        end
+
+        def autotasks_notifications_users
+          autotasks_custom_value_users("%atf_do_send_notifications: '1'%")
+        end
+
+        def notified_users_with_autotasks_field
+          notified = Array(autotasks_notifications_users)
+          # Remove users that can not view the issue
+          notified.reject! {|user| !visible?(user)}
+          notified += notified_users_without_autotasks_field
+          notified.uniq!
+          notified
+        end
+
+        def visible_with_autotasks_field?(usr=nil)
+          self.autotasks_permitted_to_view_users.include?(usr || User.current) or
+            visible_without_autotasks_field?(usr)
+        end
+
+        def attachments_visible_with_autotasks_field?(usr=nil)
+          self.autotasks_permitted_to_view_users.include?(usr || User.current) or
+            attachments_visible_without_autotasks_field?(usr)
+        end
+
+        private
+
+        # Returns values from all custom fields with autosubtasks field format
+        def autotasks_custom_value_ids(like_clause="%")
           autotask_custom_fields = (cf=CustomField.arel_table).project(:id).where(
                                      cf[:type].eq('IssueCustomField')
                                      .and( cf[:field_format].eq('autosubtasks') )
-                                     .and( cf[:format_store].matches("%atf_is_issue_viewable: '1'%") )
+                                     .and( cf[:format_store].matches(like_clause) )
                                    )
           self.custom_values
               .where(CustomValue.arel_table[:custom_field_id].in(autotask_custom_fields))
               .pluck(:value).uniq.sort
         end
 
-        def autotasks_permitted_to_view_principals
-          Principal.where(id: autotasks_permitted_to_view_principal_ids).order(:id)
-        end
+        # Returns users selected and users from selected groups
+        # in all the custom fields in issue with autosubtasks field format
+        def autotasks_custom_value_users(like_clause="%")
+          ids = autotasks_custom_value_ids(like_clause)
+          groups_users = Arel::Table.new(:groups_users)
+          users = User.arel_table
 
-        def visible_with_autotasks_field?(usr=nil)
-          self.autotasks_permitted_to_view_principals.include?(usr || User.current) or
-            (usr || User.current).groups(id: self.autotasks_permitted_to_view_principal_ids).count > 0 or
-            visible_without_autotasks_field?(usr)
-        end
-
-        def attachments_visible_with_autotasks_field?(usr=nil)
-          self.autotasks_permitted_to_view_principals.include?(usr || User.current) or
-            (usr || User.current).groups(id: self.autotasks_permitted_to_view_principal_ids).count > 0 or
-            attachments_visible_without_autotasks_field?(usr)
+          User.where(
+            users[:id].in(ids)
+            .or(users[:id].in(
+                groups_users.project(:user_id).where( groups_users[:group_id].in(ids) ) ) )
+          ).order(:id)
         end
       end
 
