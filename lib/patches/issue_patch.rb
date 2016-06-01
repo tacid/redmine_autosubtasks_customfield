@@ -83,7 +83,7 @@ module RedmineAutosubtasksCustomfield
                                    )
           self.custom_values
               .where(CustomValue.arel_table[:custom_field_id].in(autotask_custom_fields))
-              .pluck(:value).uniq.sort
+              .pluck(:value).compact.uniq
         end
 
         # Returns users selected and users from selected groups
