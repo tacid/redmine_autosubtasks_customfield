@@ -46,11 +46,19 @@ module RedmineAutosubtasksCustomfield
 
       module InstanceMethods
         def autotasks_permitted_to_view_users
-          autotasks_custom_value_users("%atf_is_issue_viewable: '1'%")
+          autotasks_custom_value_users_for_option("%atf_is_issue_viewable: '1'%")
         end
 
         def autotasks_notifications_users
-          autotasks_custom_value_users("%atf_do_send_notifications: '1'%")
+          autotasks_custom_value_users_for_option("%atf_do_send_notifications: '1'%")
+        end
+
+        def autotasks_users_for_cf_name(cf_name)
+          autotasks_custom_value_users(
+            self.custom_values.where(
+              custom_field: CustomField.where(field_format: 'autosubtasks').find_by_name(cf_name)
+            ).pluck(:value)
+          )
         end
 
         def notified_users_with_autotasks_field
@@ -86,10 +94,14 @@ module RedmineAutosubtasksCustomfield
               .pluck(:value).compact.uniq
         end
 
+        def autotasks_custom_value_users_for_option(like_clause='%')
+          autotasks_custom_value_users(autotasks_custom_value_ids(like_clause))
+        end
+
         # Returns users selected and users from selected groups
         # in all the custom fields in issue with autosubtasks field format
-        def autotasks_custom_value_users(like_clause="%")
-          ids = autotasks_custom_value_ids(like_clause)
+        def autotasks_custom_value_users(ids=nil)
+          ids ||= autotasks_custom_value_ids('%')
           groups_users = Arel::Table.new(:groups_users)
           users = User.arel_table
 
